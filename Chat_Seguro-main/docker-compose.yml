@@ -1,0 +1,79 @@
+services:
+  # MongoDB
+  mongodb:
+    image: mongo:7.0
+    container_name: chatapp-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: chatapp
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - chatapp-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/chatapp --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: chatapp-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongodb:27017/chatapp
+      - JWT_SECRET=0028f87dedbcd520567f00ccf4ea5fc6007c72ac88403938f8ea84521ff1dbb967419db506003a3fee2b081df1ef3aa7d1a1d9926e317e7cb6a92e01e79a5318
+      - ENCRYPTION_KEY=1c191a74b95621a8fe4afce2e695c3d1c830b712cf69cadbed488a7c3cb8a0c5
+      - CLIENT_ORIGIN=http://localhost:5173
+      - PORT=5000
+      - UPLOAD_STRICT_MODE=false
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./backend/uploads:/app/uploads
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - chatapp-network
+    command: npm run dev
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: chatapp-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+      - VITE_SOCKET_URL=http://localhost:5000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - chatapp-network
+    command: npm run dev -- --host
+
+networks:
+  chatapp-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local

@@ -1,0 +1,68 @@
+═══════════════════════════════════════════════════════════════
+    💬 ChatApp - Sistema de Chat en Tiempo Real
+═══════════════════════════════════════════════════════════════
+
+📥 CÓMO DESCARGAR Y USAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. DESCARGAR DESDE GITHUB
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   
+   Opción A - Con Git:
+   
+       git clone https://github.com/cjgranda19/chatapp.git
+       cd chatapp
+   
+   Opción B - Sin Git:
+   
+       • Ve a: https://github.com/cjgranda19/chatapp
+       • Clic en el botón verde "Code"
+       • Selecciona "Download ZIP"
+       • Extrae el archivo
+
+
+2. INSTALAR DOCKER
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   
+   Windows/Mac:
+       https://www.docker.com/products/docker-desktop
+   
+   Linux:
+       sudo apt install docker.io docker-compose
+
+
+3. INICIAR LA APLICACIÓN
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   
+   Windows:
+       Doble clic en INICIAR.bat
+   
+   Linux/Mac:
+       chmod +x INICIAR.sh
+       ./INICIAR.sh
+   
+   ⏳ Espera 2-3 minutos la primera vez
+
+
+4. ACCEDER
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   
+   Frontend:  http://localhost:5173
+   Admin:     admin / admin
+
+
+═══════════════════════════════════════════════════════════════
+
+📚 MÁS INFORMACIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📄 COMO_DESCARGAR.md          ← Guía detallada de descarga
+📄 LEEME_PRIMERO.md           ← Guía completa de uso
+📄 INSTRUCCIONES_DOCKER.md    ← Guía de Docker
+📄 VERIFICACION.md            ← Cómo verificar que funciona
+
+═══════════════════════════════════════════════════════════════
+
+🔗 REPOSITORIO: https://github.com/cjgranda19/chatapp
+
+═══════════════════════════════════════════════════════════════

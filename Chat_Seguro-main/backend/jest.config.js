@@ -1,0 +1,37 @@
+export default {
+  testEnvironment: 'node',
+  transform: {},
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
+  testMatch: ['**/__tests__/**/*.test.js'],
+  collectCoverageFrom: [
+    'src/**/*.js',
+    '!src/server.js',
+    '!src/app.js',
+    '!src/config/**',
+    '!src/controllers/adminController.js',
+    '!src/controllers/fileController.js',
+    '!src/controllers/messageController.js',
+    '!src/controllers/roomAdminController.js',
+    '!src/controllers/roomController.js',
+    '!src/controllers/userController.js',
+    '!src/routes/adminRoutes.js',
+    '!src/routes/fileRoutes.js',
+    '!src/routes/messageRoutes.js',
+    '!src/routes/roomAdminRoutes.js',
+    '!src/routes/userRoutes.js',
+    '!src/workers/**',
+    '!src/services/**',
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 45,
+      functions: 60,
+      lines: 65,
+      statements: 65,
+    },
+  },
+  setupFilesAfterEnv: ['<rootDir>/__tests__/setup.js'],
+  testTimeout: 10000,
+};
