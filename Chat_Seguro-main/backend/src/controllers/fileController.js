@@ -4,6 +4,9 @@ import BlockedUpload from "../models/BlockedUpload.js";
 import { detectSteganography, quickValidation } from "../utils/steganographyDetector.js";
 import fs from "fs";
 import { secureLog, errorLog } from "../utils/logger.js";
+import path from "path";
+import { detectArchiveBomb } from "../utils/archiveBombDetector.js";
+
 
 // Config: si UPLOAD_STRICT_MODE=false entonces sólo bloquear por problemas estructurales/cripto
 const UPLOAD_STRICT_MODE = (process.env.UPLOAD_STRICT_MODE || 'true').toLowerCase() !== 'false';
@@ -21,6 +24,54 @@ export const uploadFile = async (req, res) => {
       errorLog("Faltan datos obligatorios", new Error("Missing roomId or sender"));
       return res.status(400).json({ message: "Faltan datos obligatorios (roomId, sender)" });
     }
+
+        //  PASO ZIP/RAR BOMB — ANTES DEL QUICK VALIDATION
+    const archiveExt = path.extname(file.originalname || "").toLowerCase();
+
+    if (archiveExt === ".zip" || archiveExt === ".rar") {
+      secureLog("🔍 Analizando posible ZIP/RAR bomb", {
+        roomId,
+        filename: file.originalname,
+      });
+
+      const bomb = await detectArchiveBomb(file.path, archiveExt);
+
+      if (bomb.isBomb) {
+        try { fs.unlinkSync(file.path); } catch (e) {}
+
+        secureLog(" Archivo bloqueado: ZIP/RAR BOMB detectado", {
+          roomId,
+          filename: file.originalname,
+          stats: bomb.stats,
+        });
+
+        try {
+          await BlockedUpload.create({
+            originalName: file.originalname,
+            storedFilename: file.filename,
+            mimetype: file.mimetype,
+            reason: `ZIP/RAR Bomb detected (${bomb.type})`,
+            hiddenFiles: [bomb.stats],
+            detectedType: bomb.type,
+            room: roomId,
+          });
+        } catch (e) {
+          // ignorar errores de BD
+        }
+
+        return res.status(403).json({
+          message: "Archivo ZIP/RAR bloqueado (posible bomba de descompresión)",
+          reasonType: "archive_bomb",
+          details: bomb.stats,
+        });
+      }
+
+      secureLog(" Archivo comprimido NO presenta comportamiento de bomba", {
+        roomId,
+        filename: file.originalname,
+      });
+    }
+
 
     // Protección adicional: rechazar si la extensión FINAL es peligrosa (ej. photo.jpg.exe será bloqueado)
     const blockedExts = ['.exe', '.bat', '.cmd', '.com', '.scr', '.vbs', '.js', '.jar', '.sh'];
