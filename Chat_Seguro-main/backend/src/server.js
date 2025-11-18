@@ -7,6 +7,7 @@ import { connectDB } from "./config/db.js";
 import { initializeAdmin } from "./config/initAdmin.js";
 import Message from "./models/Message.js";
 import Room from "./models/Room.js";
+import bcrypt from "bcryptjs";
 import User from "./models/User.js";
 import UserRoom from "./models/UserRoom.js";
 import roomAdminRoutes from "./routes/roomAdminRoutes.js";
@@ -151,11 +152,39 @@ io.on("connection", (socket) => {
     const pin = sanitizeString(payload?.pin);
     const nickname = sanitizeString(payload?.nickname);
     try {
-      const room = await Room.findOne({ pin });
-      if (!room) {
-        socket.emit("errorMessage", "PIN inválido");
-        return;
-      }
+        // Buscar la sala comparando el PIN con los hashes almacenados
+        const rooms = await Room.find();
+        let room = null;
+        for (const r of rooms) {
+          if (r.pinHash && (await bcrypt.compare(pin, r.pinHash))) {
+            room = r;
+            break;
+          }
+
+          // Fallback para migración automática: si existe campo 'pin' en claro
+          // y coincide, aceptarlo y migrarlo a pinHash (hash y limpiar campo antiguo)
+          if (!r.pinHash && r.pin && r.pin === pin) {
+            // migrar en background
+            (async () => {
+              try {
+                const newHash = await bcrypt.hash(r.pin, 10);
+                r.pinHash = newHash;
+                r.pin = undefined;
+                await r.save();
+                secureLog("🔐", "PIN migrado a pinHash", { roomId: r._id.toString() });
+              } catch (e) {
+                errorLog("Error migrando PIN a hash", e, { roomId: r._id.toString() });
+              }
+            })();
+            room = r;
+            break;
+          }
+        }
+
+        if (!room) {
+          socket.emit("errorMessage", "PIN inválido");
+          return;
+        }
 
       const roomId = room._id.toString();
 

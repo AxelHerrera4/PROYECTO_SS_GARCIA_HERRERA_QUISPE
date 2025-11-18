@@ -35,7 +35,7 @@ export default function Login({ onLogin, onJoinRoom }) {
       if (roomRes.data) {
         toast.success(`Bienvenido ${loginRes.data.username}!`);
         onJoinRoom({
-          room: roomRes.data,
+          room: { ...roomRes.data, userPin: pin.trim() },  // Incluir el PIN ingresado
           nickname: loginRes.data.username
         });
       }

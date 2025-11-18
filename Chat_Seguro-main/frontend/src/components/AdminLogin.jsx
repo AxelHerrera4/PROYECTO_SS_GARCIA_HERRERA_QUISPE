@@ -32,7 +32,7 @@ export default function AdminLogin({ onLogin, onBack }) {
       } else {
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("adminName", res.data.name);
-        toast.success("Bienvenido Administrador 👨‍💼");
+        toast.success("Bienvenido Administrador");
         onLogin(res.data);
       }
     } catch (error) {
@@ -54,7 +54,7 @@ export default function AdminLogin({ onLogin, onBack }) {
       // Respuesta debe incluir token completo
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("adminName", res.data.name || form.username);
-      toast.success("2FA verificado. Bienvenido Administrador 👨‍💼");
+      toast.success("2FA verificado. Bienvenido Administrador");
       setRequires2fa(false);
       setTempToken(null);
       onLogin(res.data);

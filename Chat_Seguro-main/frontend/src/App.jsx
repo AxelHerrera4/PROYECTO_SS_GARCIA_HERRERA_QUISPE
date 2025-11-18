@@ -76,7 +76,7 @@ export default function App() {
           setNickname(data.nickname);
           localStorage.setItem("nickname", data.nickname);
           setSelectedRoom(data.room);
-          setView("chat");
+          setView("chat");  // Ir directo al chat, NO al dashboard
         }}
       />
     );
@@ -87,33 +87,42 @@ export default function App() {
     return (
       <ChatRoom
         roomId={selectedRoom._id}
-        pin={selectedRoom.pin}
+        pin={selectedRoom.userPin}  // PIN ingresado por el usuario, no de la BD
         nickname={nickname}
         onBack={() => {
           setSelectedRoom(null);
           setNickname("");
           localStorage.removeItem("nickname");
+          localStorage.removeItem("token");
           setView("login");
         }}
       />
     );
   }
 
-  // Vista de dashboard (por si acaso se necesita en el futuro)
+  // Si llegamos aquí y hay un nickname pero no estamos en chat,
+  // probablemente fue un refresh o navegación incorrecta → volver a login
+  if (nickname && view !== "chat") {
+    setView("login");
+    setNickname("");
+    localStorage.removeItem("nickname");
+    return null;
+  }
+
+  // Fallback: volver a login
   return (
-    <Dashboard
-      nickname={nickname}
-      onEnterRoom={(room) => {
-        setSelectedRoom(room);
+    <Login
+      onLogin={(action) => {
+        if (action === "admin") {
+          setView("adminLogin");
+        }
+      }}
+      onJoinRoom={(data) => {
+        setNickname(data.nickname);
+        localStorage.setItem("nickname", data.nickname);
+        setSelectedRoom(data.room);
         setView("chat");
       }}
-      onLogout={() => {
-        localStorage.removeItem("nickname");
-        localStorage.removeItem("token");
-        setNickname("");
-        setView("login");
-      }}
-      onOpenAdmin={() => setView("adminLogin")}
     />
   );
 }

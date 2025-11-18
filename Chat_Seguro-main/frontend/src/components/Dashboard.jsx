@@ -14,9 +14,9 @@ export default function Dashboard({ nickname, onEnterRoom, onLogout, onOpenAdmin
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   const randomColor = () => {
+    // Palette-based random color (Poseidon)
     const colors = [
-      "#4F46E5", "#10B981", "#F59E0B", "#EF4444",
-      "#3B82F6", "#EC4899", "#8B5CF6", "#0EA5E9",
+      "#45C4B0", "#13678A", "#9AEBA3", "#DAFDBA", "#012030", "#0f2b27",
     ];
     return colors[Math.floor(Math.random() * colors.length)];
   };
@@ -90,10 +90,18 @@ export default function Dashboard({ nickname, onEnterRoom, onLogout, onOpenAdmin
     setLoadingCreate(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${API_URL}/api/rooms`, newRoom, {
+      const res = await axios.post(`${API_URL}/api/rooms`, newRoom, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success("Sala creada correctamente");
+      
+      // El backend devuelve el PIN generado/usado (no se guarda en BD)
+      const createdPin = res.data.pin;
+      
+      toast.success(
+        `Sala creada correctamente\n\nPIN: ${createdPin}\n\nComparte este PIN para que otros se unan`,
+        { duration: 8000 }
+      );
+      
       setNewRoom({ name: "", type: "texto", pin: "" });
       setShowCreateForm(false);
       fetchRooms();
@@ -195,12 +203,20 @@ export default function Dashboard({ nickname, onEnterRoom, onLogout, onOpenAdmin
             key={room._id}
             className="room-card"
             style={{ background: room.color }}
-            onClick={() => onEnterRoom(room)}
+            onClick={() => {
+              // Pedir PIN al usuario para entrar
+              const userPin = prompt(`Ingresa el PIN para entrar a "${room.name}"`);
+              if (userPin && userPin.trim()) {
+                onEnterRoom({ ...room, userPin });
+              } else {
+                toast.error("PIN requerido para entrar a la sala");
+              }
+            }}
           >
             <div className="room-info">
               <h3>{room.name}</h3>
               <p>{room.type}</p>
-              <small>PIN: {room.pin}</small>
+              <small>🔐 PIN protegido</small>
             </div>
           </div>
         ))}

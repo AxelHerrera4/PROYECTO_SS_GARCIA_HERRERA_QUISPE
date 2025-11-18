@@ -3,20 +3,20 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(145deg, #0f0f23, #1a1a2e);
+  background: linear-gradient(145deg, var(--bg-main), var(--bg-card));
   font-family: "Inter", sans-serif;
   padding: 2rem;
 }
 
 .login-card {
-  background: #16181F;
+  background: var(--bg-card);
   padding: 2.5rem 3rem;
   border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-soft);
   text-align: center;
   max-width: 420px;
   width: 100%;
-  border: 1px solid #2d2d3a;
+  border: 1px solid rgba(148, 163, 184, 0.06);
   position: relative;
   overflow: hidden;
 }
@@ -28,18 +28,18 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, #6366f1, #8b5cf6, #6366f1);
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark), var(--primary));
 }
 
 .login-card h2 {
   margin-bottom: 0.5rem;
-  color: white;
+  color: var(--text-main);
   font-size: 1.8rem;
   font-weight: 700;
 }
 
 .login-card p {
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 0.95rem;
   margin-bottom: 1.5rem;
 }
@@ -53,28 +53,28 @@
 .login-card input {
   width: 100%;
   padding: 0.9rem 1rem;
-  border: 1px solid #374151;
+  border: 1px solid var(--border-soft);
   border-radius: 10px;
   font-size: 1rem;
   outline: none;
-  background-color: #1E2128;
-  color: white;
+  background-color: var(--bg-main-soft);
+  color: var(--text-main);
   transition: all 0.3s ease;
   box-sizing: border-box;
 }
 
 .login-card input::placeholder {
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .login-card input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(69,196,176,0.12);
 }
 
 .login-card button[type="submit"] {
-  background: linear-gradient(145deg, #6366f1, #4f46e5);
-  color: white;
+  background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+  color: var(--text-main);
   border: none;
   border-radius: 10px;
   padding: 0.9rem 1.2rem;
@@ -82,14 +82,14 @@
   font-size: 1rem;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 12px rgba(69,196,176,0.18);
   margin-top: 0.5rem;
 }
 
 .login-card button[type="submit"]:hover:not(:disabled) {
-  background: linear-gradient(145deg, #4f46e5, #4338ca);
+  background: linear-gradient(145deg, var(--primary-dark), var(--primary));
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 6px 20px rgba(69,196,176,0.25);
 }
 
 .login-card button[type="submit"]:disabled {
@@ -106,7 +106,7 @@
 
 .login-card > div:last-child p {
   text-align: center;
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 0.9rem;
   margin-bottom: 1rem;
 }
@@ -114,21 +114,21 @@
 .login-card > div:last-child button {
   width: 100%;
   padding: 0.9rem;
-  background: linear-gradient(145deg, #10b981, #059669);
-  color: white;
+  background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+  color: var(--text-main);
   border: none;
   border-radius: 10px;
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 12px rgba(69,196,176,0.18);
 }
 
 .login-card > div:last-child button:hover {
-  background: linear-gradient(145deg, #059669, #047857);
+  background: linear-gradient(145deg, var(--primary-dark), var(--primary));
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 6px 20px rgba(69,196,176,0.25);
 }
 
 /* Animación para el estado de carga */

@@ -22,15 +22,15 @@ export default function AdminPanel({ onBack }) {
   const [participantsModal, setParticipantsModal] = useState({ show: false, loading: false, participants: [], room: null });
   const [downloadsModal, setDownloadsModal] = useState({ show: false, loading: false, downloads: [] });
 
-  // 🔹 Cargar salas desde el backend
+  // Cargar salas desde el backend
   const fetchRooms = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log("📡 Obteniendo salas...");
+      console.log("Obteniendo salas...");
       const res = await axios.get(`${API_URL}/api/admin/rooms`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("✅ Salas obtenidas:", res.data);
+      console.log("Salas obtenidas:", res.data);
       const roomsData = res.data;
 
       // Para cada sala, obtener resumen unificado (histórico + online) desde el endpoint combinado
@@ -71,7 +71,7 @@ export default function AdminPanel({ onBack }) {
       const roomsWithCounts = await Promise.all(countsPromises);
       setRooms(roomsWithCounts);
     } catch (err) {
-      console.error("❌ Error al obtener salas:", err.response?.data || err);
+      console.error("Error al obtener salas:", err.response?.data || err);
       toast.error("Error al obtener las salas");
     }
   };
@@ -150,14 +150,14 @@ export default function AdminPanel({ onBack }) {
     return () => clearInterval(interval);
   }, []);
 
-  // 🔹 Editar
+  // Editar
   const handleEdit = (room) => {
-    console.log("✏️ Editando sala:", room);
+    console.log("Editando sala:", room);
     setEditingRoom(room);
     setForm({ name: room.name, type: room.type });
   };
 
-  // 🔹 Actualizar
+  // Actualizar
   const handleUpdate = async () => {
     if (!editingRoom) return;
     if (!form.name.trim()) {
@@ -167,7 +167,7 @@ export default function AdminPanel({ onBack }) {
 
     try {
       const token = localStorage.getItem("token");
-      console.log("📤 Actualizando sala:", editingRoom._id, form);
+      console.log("Actualizando sala:", editingRoom._id, form);
 
       const response = await axios.put(
         `${API_URL}/api/admin/rooms/${editingRoom._id}`,
@@ -175,24 +175,24 @@ export default function AdminPanel({ onBack }) {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log("✅ Respuesta actualización:", response.data);
+      console.log("Respuesta actualización:", response.data);
       toast.success("Sala actualizada correctamente");
       setEditingRoom(null);
       fetchRooms();
     } catch (err) {
-      console.error("❌ Error al actualizar:", err.response?.data || err);
+      console.error("Error al actualizar:", err.response?.data || err);
       toast.error(err.response?.data?.message || "Error al actualizar sala");
     }
   };
 
-  // 🔹 Preparar eliminación
+  // Preparar eliminación
   const handleDelete = (id) => {
-    console.log("🗑️ Preparando eliminación de sala:", id);
+    console.log("Preparando eliminación de sala:", id);
     setRoomToDelete(id);
     setShowDeleteModal(true);
   };
 
-  // 🔹 Ver miembros de la sala (solo admin)
+  // Ver miembros de la sala (solo admin)
   const viewParticipants = async (room) => {
     try {
       setParticipantsModal({ show: true, loading: true, participants: [], room });
@@ -239,35 +239,35 @@ export default function AdminPanel({ onBack }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [participantsModal.show, participantsModal.room]);
 
-  // 🔹 Confirmar eliminación
+  // Confirmar eliminación
   const confirmDelete = async () => {
     if (!roomToDelete) return;
     try {
       const token = localStorage.getItem("token");
-      console.log("🚨 Eliminando sala:", roomToDelete);
+      console.log("Eliminando sala:", roomToDelete);
 
       const response = await axios.delete(
         `${API_URL}/api/admin/rooms/${roomToDelete}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log("✅ Respuesta eliminación:", response.data);
+      console.log("Respuesta eliminación:", response.data);
       toast.success("Sala eliminada correctamente");
       setShowDeleteModal(false);
       setRoomToDelete(null);
       fetchRooms();
     } catch (err) {
-      console.error("❌ Error al eliminar:", err.response?.data || err);
+      console.error("Error al eliminar:", err.response?.data || err);
       toast.error(err.response?.data?.message || "Error al eliminar sala");
     }
   };
 
-  // 🔹 Cerrar modal de descargas
+  // Cerrar modal de descargas
   const closeDownloadsModal = () => {
     setDownloadsModal({ show: false, loading: false, downloads: [] });
   };
 
-  // 🏗️ Crear nueva sala
+  // Crear nueva sala
   const handleCreateRoom = async (e) => {
     e.preventDefault();
     if (!newRoom.name.trim()) {
@@ -298,10 +298,18 @@ export default function AdminPanel({ onBack }) {
       if (newRoom.pin && newRoom.pin.trim()) {
         roomData.pin = newRoom.pin;
       }
-      await axios.post(`${API_URL}/api/rooms`, roomData, {
+      const res = await axios.post(`${API_URL}/api/rooms`, roomData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success("Sala creada correctamente");
+      
+      // El backend devuelve el PIN generado/usado
+      const createdPin = res.data.pin;
+      
+      toast.success(
+        `Sala creada correctamente\n\nPIN: ${createdPin}\n\nComparte este PIN para que otros se unan`,
+        { duration: 8000 }
+      );
+      
       setNewRoom({ name: "", type: "texto", pin: "" });
       setShowCreateForm(false);
       fetchRooms();
@@ -328,7 +336,7 @@ export default function AdminPanel({ onBack }) {
             className="create-button" 
             onClick={() => setShowCreateForm(!showCreateForm)}
           >
-            {showCreateForm ? "✕ Cerrar" : "➕ Nueva Sala"}
+            {showCreateForm ? "Cerrar" : "Nueva Sala"}
           </button>
           <button className="back-button" onClick={onBack}>
             ← Volver
@@ -342,13 +350,13 @@ export default function AdminPanel({ onBack }) {
             title="Ir a la vista de usuario"
             style={{ marginLeft: '0.5rem' }}
           >
-            👥 Ir a Usuarios
+            Ir a Usuarios
           </button>
           {/* 2FA Controls */}
           <div style={{ marginLeft: '0.5rem', display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
             {adminProfile?.totpEnabled ? (
               <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-                <span style={{ color: '#10b981', fontWeight: 600 }}>🔒 2FA activo</span>
+                <span style={{ color: '#10b981', fontWeight: 600 }}>2FA activo</span>
                 <button
                   className="btn-2fa"
                   onClick={() => {
@@ -358,7 +366,7 @@ export default function AdminPanel({ onBack }) {
                   }}
                   title="Desactivar 2FA"
                 >
-                  ❌ Desactivar 2FA
+                  Desactivar 2FA
                 </button>
               </div>
             ) : (
@@ -379,11 +387,11 @@ export default function AdminPanel({ onBack }) {
                 }}
                 title="Configurar 2FA"
               >
-                🔐 Configurar 2FA
+                Configurar 2FA
               </button>
             )}
           </div>
-          <button className="icon-btn" onClick={() => fetchDownloads()} style={{ marginLeft: '0.5rem' }}>📥 Descargas</button>
+          <button className="icon-btn" onClick={() => fetchDownloads()} style={{ marginLeft: '0.5rem' }}>Descargas</button>
         </div>
       </header>
 
@@ -391,7 +399,7 @@ export default function AdminPanel({ onBack }) {
         {/* Formulario de Creación */}
         {showCreateForm && (
           <div className="create-form-section">
-            <h3>🏗️ Crear Nueva Sala</h3>
+            <h3>Crear Nueva Sala</h3>
             <form onSubmit={handleCreateRoom} className="create-form">
               <div className="form-row">
                 <input
@@ -422,7 +430,7 @@ export default function AdminPanel({ onBack }) {
               </div>
               <div className="form-actions">
                 <button type="submit" disabled={loadingCreate} className="save-btn">
-                  {loadingCreate ? "Creando..." : "✓ Crear Sala"}
+                  {loadingCreate ? "Creando..." : "Crear Sala"}
                 </button>
                 <button 
                   type="button" 
@@ -441,7 +449,7 @@ export default function AdminPanel({ onBack }) {
 
         {editingRoom ? (
           <div className="edit-form">
-            <h3>✏️ Editar Sala</h3>
+            <h3>Editar Sala</h3>
             <input
               type="text"
               value={form.name}
@@ -457,7 +465,7 @@ export default function AdminPanel({ onBack }) {
             </select>
             <div className="buttons">
               <button className="save-btn" onClick={handleUpdate}>
-                💾 Guardar
+                Guardar
               </button>
               <button
                 className="cancel-btn"
@@ -519,7 +527,7 @@ export default function AdminPanel({ onBack }) {
             {rooms.length === 0 ? (
               <div className="empty-state">
                 <p>No has creado ninguna sala todavía.</p>
-                <p className="hint">👆 Usa el botón "➕ Nueva Sala" para crear tu primera sala</p>
+                <p className="hint">Usa el botón "Nueva Sala" para crear tu primera sala</p>
               </div>
             ) : (
               rooms.map((room) => (
@@ -527,7 +535,7 @@ export default function AdminPanel({ onBack }) {
                   <div className="room-info">
                     <h3>{room.name}</h3>
                       <p className="room-type">{room.type}</p>
-                      <small className="room-pin">PIN: {room.pin}</small>
+                      <small className="room-pin">🔐 PIN protegido (hasheado)</small>
                       <div style={{ marginTop: '0.6rem', display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
                         <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Participantes: <strong style={{ color: '#fff' }}>{room.participantsCount ?? '—'}</strong></span>
                         <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>En línea: <strong style={{ color: '#10b981' }}>{room.activeCount ?? '0'}</strong></span>

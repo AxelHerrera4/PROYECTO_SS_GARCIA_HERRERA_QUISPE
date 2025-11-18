@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Room from "../models/Room.js";
+import bcrypt from "bcryptjs";
 import UserRoom from "../models/UserRoom.js";
 
 // 🔹 Obtener salas donde está unido el usuario
@@ -17,7 +18,29 @@ export const getUserRooms = async (req, res) => {
 export const joinRoom = async (req, res) => {
   try {
     const { nickname, pin } = req.body;
-    const room = await Room.findOne({ pin });
+    // Buscar la sala comparando el PIN con los hashes almacenados
+    const rooms = await Room.find();
+    let room = null;
+    for (const r of rooms) {
+      if (r.pinHash && (await bcrypt.compare(pin, r.pinHash))) {
+        room = r;
+        break;
+      }
+
+      // Fallback para migración automática desde campo 'pin' en claro
+      if (!r.pinHash && r.pin && r.pin === pin) {
+        try {
+          const newHash = await bcrypt.hash(r.pin, 10);
+          r.pinHash = newHash;
+          r.pin = undefined;
+          await r.save();
+        } catch (e) {
+          console.error("Error migrando PIN a hash:", e);
+        }
+        room = r;
+        break;
+      }
+    }
     if (!room) return res.status(404).json({ message: "PIN inválido" });
 
     const exists = await UserRoom.findOne({ nickname, room: room._id });
